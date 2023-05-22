@@ -32,13 +32,12 @@ h1 {
 
 .puff {
     position: absolute;
-    height: 40px;
-    width: 15px;
+    height: 60px;
+    width: 20px;
     border-radius: 50%;
     background-color: #ffffff;
     opacity: 0.5;
     animation: rise 4s infinite;
-
 }
 
 .puff:nth-child(2) {
@@ -93,7 +92,7 @@ h1 {
 }
 
 .ratio span {
-    font-size: 36px; 
+    font-size: 36px;
     margin: 0 10px;
 }
 
@@ -125,4 +124,23 @@ h1 {
 #output {
     margin-top: 20px;
     font-size: 24px;
+}
+
+/* Styles for mobile and tablet */
+@media (max-width: 768px) {
+    h1, .ratio label, .input-field, .calculate-btn, #output {
+        font-size: 2em; /* increased size for mobile and tablet */
+    }
+
+    .ratio {
+        flex-direction: column; /* stack the coffee input, label, and water ratio input on top of each other */
+    }
+
+    .fa-coffee {
+        font-size: 5em; /* reduced size of coffee icon for mobile and tablet */
+    }
+
+    .steam {
+        top: 35%; /* adjust steam position for mobile and tablet */
+    }
 }
