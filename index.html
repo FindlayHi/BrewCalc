@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cold Brew Calculator</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <h1>Cold Brew Calculator</h1>
+    <div class="coffee-icon">
+        <i class="fa fa-coffee fa-10x" aria-hidden="true"></i>
+        <div class="steam">
+            <div class="puff"></div>
+            <div class="puff"></div>
+            <div class="puff"></div>
+        </div>
+    </div>
+    <div class="calculator">
+        <div class="ratio">
+            <div>
+                <label for="coffee">Coffee (grams)</label>
+                <input type="number" id="coffee" placeholder="Enter coffee in grams" class="input-field">
+            </div>
+            <span class="ratio-divider">1:</span>
+            <div>
+                <label for="ratio">Water ratio</label>
+                <input type="number" id="ratio" value="16" class="input-field">
+            </div>
+        </div>
+        <button onclick="calculate()" class="calculate-btn">Calculate</button>
+        <h2 id="output"></h2>
+    </div>
+    
+    <script src="scripts.js"></script>
+</body>
+</html>
