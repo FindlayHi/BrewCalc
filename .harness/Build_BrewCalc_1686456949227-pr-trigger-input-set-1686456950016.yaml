@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_BrewCalc_1686456949227-pr-trigger-input-set
+  identifier: Build_BrewCalc_1686456949227prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_BrewCalc_1686456949227
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
