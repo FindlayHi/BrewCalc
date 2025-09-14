@@ -1,37 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Cold Brew Calculator</title>
-    <link rel="stylesheet" type="text/css" href="style.css?newcache01">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cold Brew Calculator</title>
+  <!-- Use Font Awesome CSS (not JS) so font-size scales predictably -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
+  <style>
+    :root{
+      --bg:#704F37;
+      --fg:#ffffff;
+      --ink:#403229;
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:24px; font-family: system-ui, Arial, sans-serif;
+      background:var(--bg); color:var(--fg);
+      display:flex; flex-direction:column; align-items:center; min-height:100vh;
+    }
+    h1{margin:20px 0 8px; font-weight:800}
+
+    /* --- HERO (mug + steam) --- */
+    .coffee-hero{
+      position:relative;
+      display:flex;
+      align-items:center; justify-content:center;
+      height:12rem;            /* reserve space so it never collapses */
+      font-size:10rem;         /* set icon size here; SVG uses 1em */
+      line-height:1;
+      margin-bottom:8px;
+      pointer-events:none;     /* decorative */
+    }
+    .coffee-hero .fa-mug-hot{  /* FA v6 icon name */
+      width:1em; height:1em;   /* ensure SVG scales with font-size */
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.25));
+    }
+    .steam{ position:absolute; top:-6px; left:50%; transform:translateX(-50%); }
+    .puff{ position:absolute; height:60px; width:20px; border-radius:50%; background:#fff; opacity:.5; animation:rise 4s infinite }
+    .puff:nth-child(2){ animation-delay:.5s }
+    .puff:nth-child(3){ animation-delay:1s }
+    @keyframes rise{ 0%{ transform:translate(0,0) } 25%{ background:rgba(255,255,255,.2) } 50%{ transform:translate(-20px,-150px) } 100%{ background:rgba(255,255,255,0); transform:translate(-40px,-300px) } }
+
+    /* --- CARD --- */
+    .card{
+      width:100%; max-width:680px; background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius: var(--radius); padding:24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      text-align:left;
+    }
+
+    .row{ display:grid; grid-template-columns: 1fr auto 1fr; gap:16px; align-items:end }
+    .row.stack{ grid-template-columns:1fr; }
+    .field{ display:flex; flex-direction:column; gap:8px }
+    label{ font-weight:600; opacity:.9 }
+    input[type="number"]{
+      width:100%; padding:14px 16px; border-radius: var(--radius); border:none;
+      background:#fff; color:#000; font-size:18px; text-align:center;
+    }
+    .ratio-divider{ font-size:28px; font-weight:800; opacity:.9; padding-bottom:6px }
+
+    .helpers{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px }
+    .chip{ border:none; border-radius:999px; padding:8px 14px; font-weight:600; cursor:pointer; background:#fff; color:#704F37; transition:.2s transform; }
+    .chip:hover{ transform: translateY(-1px) }
+
+    .actions{ display:flex; gap:12px; margin-top:16px }
+    .btn{ flex:1; border:none; border-radius: var(--radius); padding:12px 16px; font-weight:800; cursor:pointer; }
+    .primary{ background:#fff; color:#704F37 }
+    .ghost{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.6) }
+
+    #output{ margin-top:16px; font-size:22px; font-weight:800 }
+
+    @media(max-width:768px){
+      .row{ grid-template-columns:1fr }
+      .coffee-hero{ height:9rem; font-size:6rem }
+    }
+  </style>
 </head>
 <body>
-    <h1>Cold Brew Calculator</h1>
-    <div class="coffee-icon">
-        <i class="fa fa-coffee fa-10x" aria-hidden="true"></i>
-        <div class="steam">
-            <div class="puff"></div>
-            <div class="puff"></div>
-            <div class="puff"></div>
-        </div>
+  <h1>Cold Brew Calculator</h1>
+
+  <div class="coffee-hero" aria-hidden="true">
+    <!-- If FA fails, the ☕️ emoji still shows at 1em of the hero's font-size -->
+    <i class="fa-solid fa-mug-hot" aria-hidden="true">☕️</i>
+    <div class="steam" aria-hidden="true">
+      <div class="puff"></div>
+      <div class="puff"></div>
+      <div class="puff"></div>
     </div>
-    <div class="calculator">
-        <div class="ratio">
-            <div>
-                <label for="coffee">Coffee (grams)</label>
-                <input type="number" id="coffee" placeholder="Enter coffee in grams" class="input-field">
-            </div>
-            <span class="ratio-divider">1:</span>
-            <div>
-                <label for="ratio">Water ratio</label>
-                <input type="number" id="ratio" value="16" class="input-field">
-            </div>
-        </div>
-        <button onclick="calculate()" class="calculate-btn">Calculate</button>
-        <h2 id="output"></h2>
+  </div>
+
+  <div class="card">
+    <h2>Two‑way ratio: Coffee ⇄ Water</h2>
+
+    <div class="row">
+      <div class="field">
+        <label for="coffee">Coffee (grams)</label>
+        <input type="number" id="coffee" placeholder="e.g., 60">
+      </div>
+      <div class="ratio-divider">1 :</div>
+      <div class="field">
+        <label for="water">Water (grams / ml)</label>
+        <input type="number" id="water" placeholder="e.g., 960">
+      </div>
     </div>
-    
-    <script src="scripts.js"></script>
+
+    <div class="row stack" style="margin-top:16px">
+      <div class="field">
+        <label for="ratio">Brew ratio (water per 1g coffee)</label>
+        <input type="number" id="ratio" value="16">
+      </div>
+    </div>
+
+    <div class="helpers">
+      <button class="chip" data-ratio="12">1:12 (strong)</button>
+      <button class="chip" data-ratio="14">1:14</button>
+      <button class="chip" data-ratio="16">1:16 (classic)</button>
+      <button class="chip" data-ratio="18">1:18 (lighter)</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="calcBtn">Calculate</button>
+      <button class="btn ghost" id="clearBtn">Clear</button>
+    </div>
+
+    <p id="output"></p>
+    <p style="opacity:.8">Tip: Type in <em>either</em> coffee or water. I’ll fill the other automatically when you press Calculate (or use the chips).</p>
+  </div>
+
+  <script>
+    const coffeeEl=document.getElementById('coffee');
+    const waterEl=document.getElementById('water');
+    const ratioEl=document.getElementById('ratio');
+    const outEl=document.getElementById('output');
+    const chips=document.querySelectorAll('.chip');
+    const calcBtn=document.getElementById('calcBtn');
+    const clearBtn=document.getElementById('clearBtn');
+
+    let lastEdited=null;
+    [coffeeEl,waterEl,ratioEl].forEach(el=>{
+      el.addEventListener('input',()=>lastEdited=el.id);
+      el.addEventListener('focus',()=>lastEdited=el.id);
+    });
+
+    const toNumber=v=>{const n=parseFloat(v);return Number.isFinite(n)?n:NaN};
+    const fmt=n=>Number.isFinite(n)?(Math.round(n*10)/10):'';
+
+    function calculate(){
+      const coffee=toNumber(coffeeEl.value);
+      const water=toNumber(waterEl.value);
+      const ratio=toNumber(ratioEl.value);
+      if(!Number.isFinite(ratio)||ratio<=0){outEl.textContent='Enter a valid ratio.';return;}
+      if(Number.isFinite(coffee)&&!Number.isFinite(water)){
+        const w=coffee*ratio;waterEl.value=fmt(w);
+        outEl.textContent=`For ${fmt(coffee)} g coffee at 1:${ratio}, use ${fmt(w)} g water.`;return;}
+      if(!Number.isFinite(coffee)&&Number.isFinite(water)){
+        const c=water/ratio;coffeeEl.value=fmt(c);
+        outEl.textContent=`For ${fmt(water)} g water at 1:${ratio}, use ${fmt(c)} g coffee.`;return;}
+      if(Number.isFinite(coffee)&&Number.isFinite(water)){
+        if(lastEdited==='coffee'){const w=coffee*ratio;waterEl.value=fmt(w);
+          outEl.textContent=`Adjusted water to ${fmt(w)} g for ${fmt(coffee)} g coffee.`;}
+        else{const c=water/ratio;coffeeEl.value=fmt(c);
+          outEl.textContent=`Adjusted coffee to ${fmt(c)} g for ${fmt(water)} g water.`;}
+        return;}
+      outEl.textContent='Type in either Coffee or Water.';
+    }
+
+    calcBtn.addEventListener('click',calculate);
+    chips.forEach(ch=>ch.addEventListener('click',e=>{ratioEl.value=e.target.dataset.ratio;lastEdited='ratio';calculate();}));
+    clearBtn.addEventListener('click',()=>{coffeeEl.value='';waterEl.value='';outEl.textContent='';lastEdited=null;});
+    [coffeeEl,waterEl,ratioEl].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();}));
+  </script>
 </body>
 </html>
